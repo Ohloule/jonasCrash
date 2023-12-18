@@ -47,33 +47,12 @@ const initialFacts = [
 ];
 
 function App() {
-  const appTitle = "Today I Learned";
   const [showForm, setShowForm] = useState(false);
   return (
     <>
-      {/* HEADER */}
-      <header className="header">
-        <div className="logo">
-          <img
-            src="logo.png"
-            height="68"
-            width="68"
-            alt="Today I Learned Logo"
-          />
-          <h1>{appTitle}</h1>
-        </div>
-        <button
-          className="btn btn-large"
-          id="newFact"
-          onClick={() => {
-            setShowForm(!showForm);
-          }}
-        >
-          {!showForm ? "Share a fact" : "Close"}
-        </button>
-      </header>
+      <Header setShowForm={setShowForm} showForm={showForm} />
 
-      {showForm ? <NewFactForm /> : null}
+      {showForm ? <NewFactForm setShowForm={setShowForm} /> : null}
 
       <main className="main">
         <CategoryFilter />
@@ -83,10 +62,112 @@ function App() {
   );
 }
 
-function NewFactForm() {
+function Header({ showForm, setShowForm }) {
+  const appTitle = "Today I Learned";
   return (
-    <form className="fact-form" action="">
-      Fact Form
+    <header className="header">
+      <div className="logo">
+        <img src="logo.png" height="68" width="68" alt="Today I Learned Logo" />
+        <h1>{appTitle}</h1>
+      </div>
+      <button
+        className="btn btn-large"
+        id="newFact"
+        onClick={() => {
+          setShowForm(!showForm);
+        }}
+      >
+        {!showForm ? "Share a fact" : "Close"}
+      </button>
+    </header>
+  );
+}
+
+function isValidHttpUrl(string) {
+  let url;
+
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
+function NewFactForm({ setShowForm }) {
+  const [text, setText] = useState("");
+  const [source, setSource] = useState("https://example.com");
+  const [category, setCategory] = useState("");
+
+  const handleChangeText = (event) => {
+    if (text.length < 200) {
+      setText(event.target.value);
+    }
+  };
+
+  const handleSubmit = (event) => {
+    // Empécher le Navigateur de recharger la page
+    event.preventDefault();
+
+    //Vériier que le texte n'est pas vide
+    if (text && category && text.length <= 200 && isValidHttpUrl(source)) {
+      //Créer un nouvel objet fact
+      const newFact = {
+        id: Math.round(Math.random() * 1000000, 0),
+        text: text,
+        source: source,
+        category: category,
+        votesInteresting: 0,
+        votesMindblowing: 0,
+        votesFalse: 0,
+        createdIn: new Date().getFullYear(),
+      };
+
+      //Ajouter le nouvel objet fact dans la liste des facts: Ajouter le nouveau fait dans le state
+      console.log(newFact);
+
+      //Réinitialiser le formulaire
+      setText("");
+      setSource("https://example.com");
+      setCategory("");
+
+      //Fermer le formulaire
+      setShowForm(false);
+    }
+  };
+  return (
+    <form className="fact-form" onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Share a fact with the world..."
+        value={text}
+        maxLength={200}
+        onChange={handleChangeText}
+      />
+      <span>{200 - text.length}</span>
+      <input
+        type="text"
+        placeholder="Trustworthy source..."
+        value={source}
+        onChange={(event) => {
+          setSource(event.target.value);
+        }}
+      />
+      <select
+        value={category}
+        onChange={(event) => {
+          setCategory(event.target.value);
+        }}
+      >
+        <option value="">Choose category:</option>
+        {CATEGORIES.map((cat) => (
+          <option key={cat.name} value={cat.name}>
+            {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+          </option>
+        ))}
+      </select>
+      <button className="btn btn-large">Post</button>
     </form>
   );
 }
