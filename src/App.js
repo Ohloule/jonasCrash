@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./style.css";
 
 const CATEGORIES = [
@@ -45,12 +46,9 @@ const initialFacts = [
   },
 ];
 
-// LINK TO APP SAMPLE DATA: https://docs.google.com/spreadsheets/d/1eeldcA_OwP4DHYEvjG0kDe0cRys-cDPhc_E9P9G1e3I/edit#gid=0
-
-// 👍 🤯 ⛔️
-
 function App() {
   const appTitle = "Today I Learned";
+  const [showForm, setShowForm] = useState(false);
   return (
     <>
       {/* HEADER */}
@@ -64,11 +62,19 @@ function App() {
           />
           <h1>{appTitle}</h1>
         </div>
-        <button className="btn btn-large" id="newFact">
-          Share a fact
+        <button
+          className="btn btn-large"
+          id="newFact"
+          onClick={() => {
+            setShowForm(!showForm);
+          }}
+        >
+          {!showForm ? "Share a fact" : "Close"}
         </button>
       </header>
-      <NewFactForm />
+
+      {showForm ? <NewFactForm /> : null}
+
       <main className="main">
         <CategoryFilter />
         <FactList />
@@ -77,45 +83,32 @@ function App() {
   );
 }
 
-/* function HeaderSite() {
-  return (
-    
-    <header className="header">
-      <div className="logo">
-        <img src="logo.png" height="68" width="68" alt="Today I Learned Logo" />
-        <h1>Today I Learned</h1>
-      </div>
-      <button className="btn btn-large" id="newFact">
-        Share a fact
-      </button>
-    </header>
-  );
-} 
-*/
-
 function NewFactForm() {
-  return <form action="">Fact form</form>;
+  return (
+    <form className="fact-form" action="">
+      Fact Form
+    </form>
+  );
 }
 
 function CategoryFilter() {
   return (
     <aside>
-      Category Filter
-      {/* <ul>
-        <li class="category">
-          <button class="btn btn-all-categories">All</button>
+      <ul>
+        <li className="category">
+          <button className="btn btn-all-categories">All</button>
         </li>
-        <li class="category">
-          <button class="btn btn-category" style="background-color: #3b82f6">
-            Technology
-          </button>
-        </li>
-        <li class="category">
-          <button class="btn btn-category" style="background-color: #16a34a">
-            Science
-          </button>
-        </li>
-      </ul> */}
+        {CATEGORIES.map((cat) => (
+          <li className="category" key={cat.name}>
+            <button
+              className="btn btn-category"
+              style={{ backgroundColor: cat.color }}
+            >
+              {cat.name}
+            </button>
+          </li>
+        ))}
+      </ul>
     </aside>
   );
 }
@@ -126,37 +119,44 @@ function FactList() {
     <section>
       <ul className="facts-list">
         {facts.map((fact) => (
-          <li key={fact.id} className="fact">
-            <p>
-              {fact.text}
-              <a
-                className="source"
-                href={fact.source}
-                target="_blank"
-                rel="noreferrer"
-              >
-                (Source)
-              </a>
-            </p>
-            <span
-              className="tag"
-              style={{
-                backgroundColor: CATEGORIES.find(
-                  (category) => category.name === fact.category
-                ).color,
-              }}
-            >
-              {fact.category}
-            </span>
-            <div className="vote-buttons">
-              <button>👍 {fact.votesInteresting}</button>
-              <button>🤯 {fact.votesMindblowing}</button>
-              <button>⛔️ {fact.votesFalse}</button>
-            </div>
-          </li>
+          <Fact key={fact.id} fact={fact} essai={"bidule"} />
         ))}
       </ul>
+      <p>There are {facts.length} facts in the database. Add your own ! </p>
     </section>
+  );
+}
+
+function Fact({ fact }) {
+  return (
+    <li className="fact">
+      <p>
+        {fact.text}
+        <a
+          className="source"
+          href={fact.source}
+          target="_blank"
+          rel="noreferrer"
+        >
+          (Source)
+        </a>
+      </p>
+      <span
+        className="tag"
+        style={{
+          backgroundColor: CATEGORIES.find(
+            (category) => category.name === fact.category
+          ).color,
+        }}
+      >
+        {fact.category}
+      </span>
+      <div className="vote-buttons">
+        <button>👍 {fact.votesInteresting}</button>
+        <button>🤯 {fact.votesMindblowing}</button>
+        <button>⛔️ {fact.votesFalse}</button>
+      </div>
+    </li>
   );
 }
 
