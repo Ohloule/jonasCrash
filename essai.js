@@ -8,6 +8,19 @@ const CATEGORIES = [
   { name: "history", color: "#f97316" },
   { name: "news", color: "#8b5cf6" },
 ];
-CATEGORIES.map((item) => {
-  console.log(item.name);
-});
+
+
+
+function isValidHttpUrl(string) {
+  let url;
+
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
+console.log(isValidHttpUrl("https://fhsqkldfdsq.fsddf"))
